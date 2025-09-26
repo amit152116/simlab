@@ -13,6 +13,7 @@ find_package(
   SFML 2.5
   COMPONENTS graphics window system
   REQUIRED)
+find_package(fmt REQUIRED)
 
 # Add common lib
 add_subdirectory(lib)

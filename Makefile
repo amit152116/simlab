@@ -9,14 +9,11 @@ all: build
 
 # Create build directory and generate CMake files
 cmake_init:
-	@mkdir -p $(BUILD_DIR)
-	@cd $(BUILD_DIR) && cmake ..
+	@cmake -B $(BUILD_DIR) -S .
 
 # Build the project
 build: cmake_init
-	@echo "Building project..."
 	@cd $(BUILD_DIR) && make -j$(shell nproc)
-	@echo "Build complete!"
 
 run_%:
 	@echo "Running program: $*"
@@ -24,9 +21,7 @@ run_%:
 
 # Clean build directory
 clean:
-	@echo "Cleaning build directory..."
 	@rm -rf $(BUILD_DIR)
-	@echo "Clean complete!"
 
 # Rebuild the project
 rebuild: clean build

@@ -1,7 +1,20 @@
 file(GLOB SRC_FILES src/*.cpp)
 
-add_library(simlab_lib ${SRC_FILES})
+foreach(src_file ${SRC_FILES})
+  # Get the filename without extension
+  get_filename_component(exec_name ${src_file} NAME_WE)
 
-target_include_directories(simlab_lib PUBLIC include)
+  # Create an executable with that name
+  add_executable(${exec_name} ${src_file})
 
-target_link_libraries(simlab_lib PUBLIC sfml-graphics sfml-window sfml-system)
+  # Add include path
+  target_include_directories(${exec_name} PUBLIC include)
+
+  # Link SFML
+  target_link_libraries(${exec_name} PRIVATE simlab)
+endforeach()
+
+file(GLOB simlab_FILES src/simlab/*.cpp)
+add_library(simlab STATIC ${simlab_FILES})
+target_include_directories(simlab PUBLIC include)
+target_link_libraries(simlab PRIVATE sfml-graphics sfml-window sfml-system)
