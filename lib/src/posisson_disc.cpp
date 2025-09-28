@@ -47,8 +47,8 @@ namespace {
         PosissonDiscSampling()
             : simlab::Game("Posisson-Disc Sampling", sf::Style::Fullscreen,
                            createContextSettings()),
-              width(static_cast<int>(m_window.getSize().x)),
-              height(static_cast<int>(m_window.getSize().y)),
+              width(static_cast<int>(window.getSize().x)),
+              height(static_cast<int>(window.getSize().y)),
               rows(std::floor(height / cellSize)),
               cols(std::floor(width / cellSize)),
               generator(std::random_device{}()),

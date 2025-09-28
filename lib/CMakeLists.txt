@@ -14,8 +14,8 @@ foreach(src_file ${SRC_FILES})
   target_link_libraries(${exec_name} PRIVATE simlab)
 endforeach()
 
-file(GLOB simlab_FILES src/simlab/*.cpp)
-add_library(simlab STATIC ${simlab_FILES})
+file(GLOB_RECURSE SIMLAB_FILES src/simlab/*.cpp)
+add_library(simlab STATIC ${SIMLAB_FILES})
 target_include_directories(simlab PUBLIC include)
 target_link_libraries(
   simlab

@@ -8,7 +8,7 @@
 #include <random>
 #include <unordered_map>
 
-namespace Game {
+namespace {
     class CollisionGame : public simlab::Game {
       private:
 
@@ -47,7 +47,7 @@ namespace Game {
             // m_physicsManager->setFixedTimeStep(false);
             // m_window.setVerticalSyncEnabled(true);
 
-            renderTex.create(m_window.getSize().x, m_window.getSize().y);
+            renderTex.create(window.getSize().x, window.getSize().y);
             sprite.setTexture(renderTex.getTexture());
 
             ball.setFillColor(sf::Color::Black);
@@ -133,14 +133,14 @@ namespace Game {
 
             // 2. Predict next position
             predictNextPosition(ball, ballSpeed, dt);
-            windowCollision(m_window, ball, ballSpeed);
+            windowCollision(window, ball, ballSpeed);
 
             for (int i = 0; i < nBalls; i++) {
                 auto& ball  = balls[i];
                 auto& speed = ballSpeeds[i];
 
                 predictNextPosition(ball, speed, dt);
-                windowCollision(m_window, ball, speed);
+                windowCollision(window, ball, speed);
                 auto cell = simlab::toVector2i(ball.getPosition() / cellSize);
                 gridBucket[cell].push_back(i);
 
@@ -219,11 +219,10 @@ namespace Game {
         void handleEvents(sf::Event& event) override {}
     };
 
-}  // namespace Game
+}  // namespace
 
 auto main() -> int {
-    Game::CollisionGame game;
-
+    CollisionGame game;
     game.Run();
     return 0;
 }

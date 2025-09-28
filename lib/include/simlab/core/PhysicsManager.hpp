@@ -1,6 +1,6 @@
 #pragma once
 
-#include "simlab/Benchmark.hpp"
+#include "simlab/core/Benchmark.hpp"
 
 #include <atomic>
 #include <chrono>

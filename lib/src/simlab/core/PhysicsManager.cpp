@@ -1,4 +1,4 @@
-#include "simlab/PhysicsManager.hpp"
+#include "simlab/core/PhysicsManager.hpp"
 
 namespace simlab {
 

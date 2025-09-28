@@ -1,9 +1,7 @@
-#include <fmt/core.h>
 
 #include <SFML/Graphics.hpp>
 
-#include "simlab/formatter.hpp"
-#include "simlab/utils.hpp"
+#include "simlab/core/utils.hpp"
 
 #include <algorithm>
 #include <cmath>

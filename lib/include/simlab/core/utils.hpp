@@ -1,4 +1,6 @@
 #pragma once
+#include <fmt/core.h>
+
 #include <SFML/Graphics.hpp>
 
 #include <algorithm>
@@ -224,9 +226,10 @@ namespace simlab {
     inline auto lerp(const sf::Vector2<T>& a, const sf::Vector2<T>& b, float t)
         -> sf::Vector2<T> {
         if (t < 0.F || t > 1.F) {
-            throw std::runtime_error("lerp: t must be between 0 and 1");
+            throw std::runtime_error(fmt::format(
+                "wrong value: {}\nlerp: t must be between 0 and 1", t));
         }
-        return a + (b - a) * t;
+        return (1 - t) * a + b * t;
     }
 
 }  // namespace simlab

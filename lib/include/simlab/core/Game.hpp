@@ -1,9 +1,10 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-#include "simlab/Benchmark.hpp"
-#include "simlab/PhysicsManager.hpp"
+#include "simlab/core/PhysicsManager.hpp"
 #include "simlab/logger/Logger.hpp"
+
+#include <memory>
 
 constexpr int WindowWidth  = 1920;
 constexpr int WindowHeight = 1080;
@@ -30,7 +31,7 @@ namespace simlab {
 
         virtual ~Game() {
             if (m_physicsEngine) {
-                m_physicsManager->stop();  // stop and join thread safely
+                physicsManager->stop();  // stop and join thread safely
             }
         }
 
@@ -53,16 +54,16 @@ namespace simlab {
 
         void disablePhysicsEngine();
 
-        std::unique_ptr<simlab::PhysicsManager> m_physicsManager;
+        std::unique_ptr<simlab::PhysicsManager> physicsManager;
 
-        sf::RenderWindow m_window;
+        sf::RenderWindow window;
         Logger::Logger&  log;
 
       private:
 
         void pollEvents();
 
-        uint  m_frameRate     = 60;
+        uint  m_frameRate     = 120;
         float m_timeScale     = 1.0F;
         bool  m_physicsEngine = false;
     };
