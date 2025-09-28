@@ -17,4 +17,7 @@ endforeach()
 file(GLOB simlab_FILES src/simlab/*.cpp)
 add_library(simlab STATIC ${simlab_FILES})
 target_include_directories(simlab PUBLIC include)
-target_link_libraries(simlab PRIVATE sfml-graphics sfml-window sfml-system)
+target_link_libraries(
+  simlab
+  PRIVATE sfml-graphics sfml-window sfml-system
+  PUBLIC fmt::fmt)

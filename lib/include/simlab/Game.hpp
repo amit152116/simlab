@@ -5,6 +5,9 @@
 #include "simlab/PhysicsManager.hpp"
 #include "simlab/logger/Logger.hpp"
 
+constexpr int WindowWidth  = 1920;
+constexpr int WindowHeight = 1080;
+
 namespace simlab {
 
     class Game {
@@ -15,7 +18,15 @@ namespace simlab {
         auto operator=(const Game&) -> Game& = delete;
         auto operator=(Game&&) -> Game&      = delete;
 
-        Game(unsigned int width, unsigned int height, const std::string& title);
+        Game(unsigned int width, unsigned int height, const std::string& title,
+             sf::Uint32          style    = sf::Style::Default,
+             sf::ContextSettings settings = sf::ContextSettings());
+
+        explicit Game(const std::string&  title,
+                      sf::Uint32          style    = sf::Style::Default,
+                      sf::ContextSettings settings = sf::ContextSettings());
+
+        Game();
 
         virtual ~Game() {
             if (m_physicsEngine) {
@@ -32,7 +43,7 @@ namespace simlab {
         virtual void Draw(sf::RenderWindow& win) = 0;
 
         // default event handler (can override if needed)
-        virtual void handleEvents(sf::Event& event) = 0;
+        virtual void handleEvents(sf::Event& event) {};
 
         void setFramerateLimit(uint limit);
 

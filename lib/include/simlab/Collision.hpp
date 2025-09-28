@@ -1,5 +1,8 @@
+#include <fmt/core.h>
+
 #include <SFML/Graphics.hpp>
 
+#include "simlab/formatter.hpp"
 #include "simlab/utils.hpp"
 
 #include <algorithm>
@@ -14,6 +17,7 @@ namespace simlab {
         sf::Vector2f point;   // Approximate collision point
         sf::Vector2f normal;  // Approximate collision normal
         float        penetration{};
+        sf::Vector2f contactPoint;
     };
 
     class Collision {
@@ -33,37 +37,108 @@ namespace simlab {
             CollisionInfo result;
             result.collided = false;
 
-            // Get positions and radii
-            sf::Vector2f pos1    = circle1.getPosition();
-            sf::Vector2f pos2    = circle2.getPosition();
-            float        radius1 = circle1.getRadius();
-            float        radius2 = circle2.getRadius();
-
             // Calculate distance vector from circle1 to circle2
-            sf::Vector2f distanceVec = pos2 - pos1;
-            float        distance    = sqrt((distanceVec.x * distanceVec.x) +
-                                            (distanceVec.y * distanceVec.y));
+            sf::Vector2f distanceVec =
+                circle2.getPosition() - circle1.getPosition();
+            float distance = magnitude(distanceVec);
 
             // Sum of radii
-            float radiusSum = radius1 + radius2;
+            float radiusSum = circle1.getRadius() + circle2.getRadius();
 
             // Check if circles are colliding
             if (distance <= radiusSum &&
                 distance > 0.001F) {  // Avoid division by zero
-                result.collided = true;
-
-                // Calculate penetration depth
+                result.collided    = true;
                 result.penetration = radiusSum - distance;
+                result.normal      = distanceVec / distance;
+                result.magnitude   = distance;
 
-                // Calculate collision normal (normalized direction from circle1
-                // to circle2)
-                result.normal = distanceVec / distance;
-
-                // Calculate contact point (on the line connecting centers)
-                // result.contactPoint = pos1 + result.normal * radius1;
+                result.contactPoint =
+                    circle1.getPosition() + result.normal * circle1.getRadius();
             }
 
             return result;
+        }
+
+        // Elastic collision response between two circles
+        static void elasticCollisionAdvanced(sf::CircleShape& circle1,
+                                             sf::CircleShape& circle2,
+                                             sf::Vector2f&    velocity1,
+                                             sf::Vector2f&    velocity2,
+                                             float restitution = 1.0F,
+                                             float friction    = 0.0F) {
+            auto collision = circleCollision(circle1, circle2);
+            if (!collision.collided) {
+                return;
+            }
+
+            // Get masses (assuming uniform density, mass = area)
+            float mass1 = std::pow(circle1.getRadius(), 2.0F);
+            float mass2 = std::pow(circle2.getRadius(), 2.0F);
+
+            // Position correction with improved stability
+            sf::Vector2f pos1 = circle1.getPosition();
+            sf::Vector2f pos2 = circle2.getPosition();
+
+            // Separate objects
+            float totalMass   = mass1 + mass2;
+            float separation1 = collision.penetration * (mass2 / totalMass);
+            float separation2 = collision.penetration * (mass1 / totalMass);
+
+            pos1 -= collision.normal * separation1;
+            pos2 += collision.normal * separation2;
+
+            circle1.setPosition(pos1);
+            circle2.setPosition(pos2);
+
+            // Enhanced velocity resolution
+            sf::Vector2f relativeVelocity = velocity2 - velocity1;
+            float        velocityAlongNormal =
+                simlab::dotProduct(relativeVelocity, collision.normal);
+
+            // Only resolve approaching velocities
+            if (velocityAlongNormal > 0) {
+                return;
+            }
+
+            // Normal impulse (standard collision response)
+            float normalImpulse = -(1.0F + restitution) * velocityAlongNormal;
+            normalImpulse /= ((1.0F / mass1) + (1.0F / mass2));
+
+            sf::Vector2f normalImpulseVec = normalImpulse * collision.normal;
+
+            // Apply normal impulse
+            velocity1 -= normalImpulseVec / mass1;
+            velocity2 += normalImpulseVec / mass2;
+
+            // Friction (tangential impulse)
+            if (friction > 0.0F) {
+                // Calculate tangent vector
+                sf::Vector2f tangent =
+                    relativeVelocity - velocityAlongNormal * collision.normal;
+                float tangentLength = magnitude(tangent);
+
+                if (tangentLength > 0.001F) {
+                    tangent = normalize(tangent);
+
+                    float velocityAlongTangent =
+                        dotProduct(relativeVelocity, tangent);
+
+                    float frictionImpulse = -velocityAlongTangent;
+                    frictionImpulse /= ((1.0F / mass1) + (1.0F / mass2));
+
+                    // Clamp friction impulse
+                    float maxFriction = friction * std::abs(normalImpulse);
+                    frictionImpulse =
+                        std::clamp(frictionImpulse, -maxFriction, maxFriction);
+
+                    sf::Vector2f frictionImpulseVec = frictionImpulse * tangent;
+
+                    // Apply friction impulse
+                    velocity1 -= frictionImpulseVec / mass1;
+                    velocity2 += frictionImpulseVec / mass2;
+                }
+            }
         }
 
         static auto windowCollision(const sf::CircleShape&  circle,

@@ -3,8 +3,25 @@
 namespace simlab {
 
     Game::Game(unsigned int width, unsigned int height,
-               const std::string& title)
-        : m_window(sf::VideoMode(width, height), title, sf::Style::Default),
+               const std::string& title, sf::Uint32 style,
+               sf::ContextSettings settings)
+        : m_window(sf::VideoMode(width, height), title, style, settings),
+          log(Logger::getLogger()) {
+        setFramerateLimit(m_frameRate);
+    }
+
+    Game::Game(const std::string& title, sf::Uint32 style,
+               sf::ContextSettings settings)
+        : m_window(sf::VideoMode(WindowWidth, WindowHeight), title, style,
+                   settings),
+          log(Logger::getLogger()) {
+        setFramerateLimit(m_frameRate);
+    }
+
+    Game::Game()
+        : m_window(sf::VideoMode(WindowWidth, WindowHeight), "SFML Window",
+                   sf::Style::Default),
+
           log(Logger::getLogger()) {
         setFramerateLimit(m_frameRate);
     }
@@ -66,6 +83,12 @@ namespace simlab {
             if (event.type == sf::Event::Closed) {
                 m_window.close();
                 break;  // exit event loop
+            }
+
+            // NOLINTNEXTLINE(cppcoreguidelines-pro-type-union-access)
+            if (event.type == sf::Event::KeyPressed &&
+                event.key.code == sf::Keyboard::Escape) {
+                m_window.close();
             }
 
             if (m_physicsEngine) {

@@ -30,7 +30,19 @@ auto operator-(const sf::Vector2<T>& v, T scalar) -> sf::Vector2<T> {
     return {v.x - scalar, v.y - scalar};
 }
 
+template <typename T>
+struct Vector2Hash {
+    auto operator()(const sf::Vector2<T>& v) const noexcept -> std::size_t {
+        return std::hash<T>()(v.x) ^ (std::hash<T>()(v.y) << 1);
+    }
+};
+
 namespace simlab {
+
+    inline auto toVector2i(const sf::Vector2f& v) -> sf::Vector2i {
+        return {static_cast<int>(std::floor(v.x)),
+                static_cast<int>(std::floor(v.y))};
+    }
 
     // ✅ Clamp a shape’s position inside the window
     inline void clampToWindow(sf::Shape& shape, const sf::RenderWindow& window,
@@ -89,10 +101,23 @@ namespace simlab {
         return static_cast<T>(std::sqrt((dx * dx) + (dy * dy)));
     }
 
+    template <typename T>
+    inline auto distanceSquared(const sf::Vector2<T>& a,
+                                const sf::Vector2<T>& b) -> T {
+        float dx = a.x - b.x;
+        float dy = a.y - b.y;
+        return (dx * dx) + (dy * dy);
+    }
+
     // ✅ Magnitude of a vector
     template <typename T>
     inline auto magnitude(const sf::Vector2<T>& v) -> T {
         return static_cast<T>(std::sqrt((v.x * v.x) + (v.y * v.y)));
+    }
+
+    template <typename T>
+    inline auto magnitudeSquared(const sf::Vector2<T>& v) -> T {
+        return (v.x * v.x) + (v.y * v.y);
     }
 
     // ✅ Normalize a vector

@@ -15,6 +15,13 @@ cmake_init:
 build: cmake_init
 	@cd $(BUILD_DIR) && make -j$(shell nproc)
 
+
+asan:
+	@cmake -B $(BUILD_DIR) -S . -DCMAKE_BUILD_TYPE=Debug \
+		-DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g" \
+		-DCMAKE_C_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g"
+	@$(MAKE) build
+
 run_%:
 	@echo "Running program: $*"
 	@$(BIN_DIR)/$*
