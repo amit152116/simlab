@@ -1,8 +1,5 @@
 #include "simlab/simlab.hpp"
 
-#include <algorithm>
-#include <random>
-
 namespace {
 
     class DrawBezierCurve : public simlab::Game {
@@ -20,11 +17,11 @@ namespace {
 
             settings.sRgbCapable       = true;
             settings.antialiasingLevel = 8;
-            settings.depthBits         = 24;
             return settings;
         }
 
         simlab::BezierCurve curve;
+        simlab::BezierCurve curve2;
 
       public:
 
@@ -42,13 +39,15 @@ namespace {
 
             auto controlPoints = {startPoint, midPoint, endPoint};
             curve.setControlPoints(controlPoints);
-            curve.append({700, 750});
+            // curve.append({700, 750});
             curve.append({200, 750});
             curve.append({1000, 1000});
             curve.setPrimitiveType(sf::LineStrip);
             curve.setControlPointRadius(10.0);
             curve.setStep(0.001);
-            curve.enableLines(true);
+            curve.enableDotLines(true);
+
+            curve2.setControlPoints(controlPoints);
         }
 
       private:
@@ -59,6 +58,7 @@ namespace {
             renderTex.clear(sf::Color::Black);
 
             renderTex.draw(curve);
+            renderTex.draw(curve2);
 
             renderTex.display();
 
@@ -66,7 +66,24 @@ namespace {
         };
 
         void handleEvents(sf::Event& event) override {
+            static bool enabled = true;
             curve.handleEvents(event, window);
+            curve2.handleEvents(event, window);
+
+            if (event.type == sf::Event::MouseButtonPressed &&
+                event.mouseButton.button == sf::Mouse::Right) {
+                if (enabled) {
+                    enabled = false;
+                    curve.enableControlPoints(false);
+                    curve.enableDotLines(false);
+                    curve.enableLines(false);
+                } else {
+                    enabled = true;
+                    curve.enableControlPoints(true);
+                    curve.enableDotLines(true);
+                    curve.enableLines(true);
+                }
+            }
         }
     };
 

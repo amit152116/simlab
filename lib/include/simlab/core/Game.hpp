@@ -7,7 +7,7 @@
 #include <memory>
 
 constexpr int WindowWidth  = 1920;
-constexpr int WindowHeight = 1080;
+constexpr int WindowHeight = 1200;
 
 namespace simlab {
 

@@ -1,6 +1,5 @@
 
-#include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/VertexArray.hpp>
+#include <SFML/Graphics.hpp>
 
 #include "simlab/core/utils.hpp"
 
@@ -52,8 +51,9 @@ namespace simlab {
 
         auto getControlPoints() -> std::vector<sf::Vector2f>;
 
-        auto enableLines(bool enabled) -> void;
+        auto enableDotLines(bool enabled) -> void;
         auto enableControlPoints(bool enabled) -> void;
+        auto enableLines(bool enabled) -> void;
 
       private:
 
@@ -65,10 +65,12 @@ namespace simlab {
         auto updateCurve() -> void;
 
         static auto getCurvePoints(std::vector<sf::Vector2f>& pointArray,
-                                   float t) -> std::vector<sf::Vector2f>;
+                                   float t, sf::VertexArray& lines)
+            -> std::vector<sf::Vector2f>;
 
         sf::VertexArray              curve;
         sf::VertexArray              dotlines;
+        sf::VertexArray              lines;
         std::vector<sf::Vector2f>    controlPoints;
         std::vector<sf::CircleShape> controlPointsShapes;
         std::vector<sf::Text>        texts;
@@ -78,12 +80,13 @@ namespace simlab {
 
         double    step               = 0.05;
         float     controlPointRadius = 8.F;
-        sf::Color controlPointColor  = sf::Color::Red;
-        sf::Color curveColor         = sf::Color::Green;
+        sf::Color controlPointColor  = sf::Color::White;
+        sf::Color curveColor         = sf::Color::Blue;
         sf::Color textColor          = sf::Color::White;
 
-        bool showLines_         = false;
+        bool showDotLines_      = false;
         bool showControlPoints_ = true;
+        bool showLines_         = false;
     };
 
 }  // namespace simlab
