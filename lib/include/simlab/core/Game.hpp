@@ -40,7 +40,7 @@ namespace simlab {
       protected:
 
         // --- to be overridden by subclasses ---
-        virtual void Update(float dt)            = 0;
+        virtual void Update(float dt) {};
         virtual void Draw(sf::RenderWindow& win) = 0;
 
         // default event handler (can override if needed)
@@ -49,6 +49,8 @@ namespace simlab {
         void setFramerateLimit(uint limit);
 
         void setTimeScale(float scale);
+
+        void setFixedUpdateRate(float limit);
 
         void enablePhysicsEngine();
 
@@ -62,9 +64,13 @@ namespace simlab {
       private:
 
         void pollEvents();
+        void fixedUpdate(float dt);
 
-        uint  m_frameRate     = 120;
-        float m_timeScale     = 1.0F;
-        bool  m_physicsEngine = false;
+        uint  m_frameRate       = 120;
+        float m_timeScale       = 1.0F;
+        bool  m_physicsEngine   = false;
+        bool  m_fixedUpdate     = false;
+        float m_updateRateLimit = static_cast<float>(m_frameRate);
+        float m_fixedDeltaTime  = 1.0F / m_updateRateLimit;
     };
 }  // namespace simlab

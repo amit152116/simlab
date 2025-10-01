@@ -31,7 +31,8 @@ namespace simlab {
         if (m_physicsEngine) {
             physicsManager->setPhysicsFunction(
                 [this](float dt) -> void { this->Update(dt); });
-            physicsManager->setTargetFPS(120);
+            physicsManager->setTargetFPS(m_updateRateLimit);
+            physicsManager->setFixedTimeStep(true);
             physicsManager->start();
         }
         sf::Clock clock;
@@ -41,7 +42,7 @@ namespace simlab {
             dt *= m_timeScale;
             pollEvents();
             if (!m_physicsEngine) {
-                Update(dt);
+                fixedUpdate(dt);
                 window.clear();
                 Draw(window);
                 window.display();
@@ -61,6 +62,15 @@ namespace simlab {
     void Game::setFramerateLimit(uint limit) {
         m_frameRate = limit;
         window.setFramerateLimit(m_frameRate);
+        if (!m_fixedUpdate) {
+            setFixedUpdateRate(static_cast<float>(limit));
+        }
+    }
+
+    void Game::setFixedUpdateRate(float limit) {
+        m_updateRateLimit = limit;
+        m_fixedDeltaTime  = 1.0F / m_updateRateLimit;
+        m_fixedUpdate     = true;
     }
 
     void Game::setTimeScale(float scale) {
@@ -75,6 +85,23 @@ namespace simlab {
     void Game::disablePhysicsEngine() {
         physicsManager  = nullptr;
         m_physicsEngine = false;
+    }
+
+    void Game::fixedUpdate(float dt) {
+        if (!m_fixedUpdate) {
+            Update(dt);
+        }
+        static float accumulator = 0.0F;
+
+        accumulator += dt;
+
+        while (accumulator >= m_fixedDeltaTime) {
+            Update(m_fixedDeltaTime);
+
+            accumulator -= m_fixedDeltaTime;
+        }
+        // Keep small leftover for smooth simulation (don’t reset to 0!)
+        accumulator = std::min(accumulator, m_fixedDeltaTime);
     }
 
     void Game::pollEvents() {

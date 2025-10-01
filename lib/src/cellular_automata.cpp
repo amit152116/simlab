@@ -7,13 +7,14 @@ namespace {
     class CellularAutomata : public simlab::Game {
       private:
 
-        inline static int      RULE    = 30;
-        static constexpr float boxSize = 5.F;
+        float probabilityOfOne = 0.10F;  // 20% chance of 1, 70% chance of 0
+        inline static int      RULE     = 30;
+        static constexpr float cellSize = 5.F;
 
         int gridWidth, gridHeight;
 
         std::vector<sf::RectangleShape> squares;
-        std::vector<int>                states;
+        std::vector<bool>               states;
 
         sf::RenderTexture renderTex;
         sf::Sprite        sprite;
@@ -37,8 +38,8 @@ namespace {
                            window.getSize().y / 2.F);  // initial center
             window.setView(view);
 
-            gridWidth  = window.getSize().x / static_cast<int>(boxSize);
-            gridHeight = window.getSize().y / static_cast<int>(boxSize);
+            gridWidth  = window.getSize().x / static_cast<int>(cellSize);
+            gridHeight = window.getSize().y / static_cast<int>(cellSize);
 
             log.info("Grid Width: {}\n", gridWidth);
             log.info("Grid Height: {}\n", gridHeight);
@@ -49,48 +50,49 @@ namespace {
             initalize();
         }
 
+      private:
+
         void initalize() {
-            renderTex.clear(sf::Color::White);
+            renderTex.clear(sf::Color::Black);
             currRow = 1;
-            static std::uniform_int_distribution<int> random(0, 1);
+            std::bernoulli_distribution dist(probabilityOfOne);
 
             for (int i = 0; i < gridWidth; i++) {
-                auto state = random(generator);
-                states[i]  = 0;
-                squares[i].setSize({boxSize, boxSize});
-                squares[i].setPosition({i * boxSize, 00});
-                squares[i].setFillColor(sf::Color::White);
-                if (states[i] == 1) {
-                    squares[i].setFillColor(sf::Color::Black);
-                }
+                auto state = dist(generator);
+                states[i]  = state;
+                squares[i].setSize({cellSize, cellSize});
+                squares[i].setPosition({i * cellSize, 00});
+                squares[i].setFillColor(getColor(states[i]));
             }
 
-            auto mid    = (gridWidth - 1) / 2;
-            states[mid] = 1;
-            squares[mid].setFillColor(sf::Color::Black);
+            // auto mid    = (gridWidth - 1) / 2;
+            // states[mid] = true;
+            // squares[mid].setFillColor(getColor(states[mid]));
         }
 
-        static auto cellular_state(int a, int b, int c) -> int {
+        static auto calcNextState(bool a, bool b, bool c) -> bool {
             uint8_t pattern = (b << 1) | (a << 2) | c;
-            return (RULE >> pattern) &
-                   1;  // shift right by pattern index, LSB = pattern 000
+            return ((RULE >> pattern) & 1) != 0;  // LSB = pattern 000
+        }
+
+        static auto getColor(bool state) -> sf::Color {
+            return state ? sf::Color::White : sf::Color::Black;
         }
 
         void Update(float dt) override {
             if (currRow >= gridHeight) {
                 return;
             }
-            std::vector<int> newStates(gridWidth);
+            std::vector<bool> newStates(gridWidth);
             for (int i = 0; i < gridWidth; i++) {
                 auto left  = states[(i - 1 + gridWidth) % gridWidth];
                 auto mid   = states[i];
                 auto right = states[(i + 1 + gridWidth) % gridWidth];
 
-                newStates[i] = cellular_state(left, mid, right);
+                newStates[i] = calcNextState(left, mid, right);
 
-                squares[i].setPosition({i * boxSize, currRow * boxSize});
-                squares[i].setFillColor(newStates[i] == 0 ? sf::Color::White
-                                                          : sf::Color::Black);
+                squares[i].setPosition({i * cellSize, currRow * cellSize});
+                squares[i].setFillColor(getColor(newStates[i]));
             }
             states = std::move(newStates);
             currRow++;
