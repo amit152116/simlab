@@ -9,7 +9,7 @@
 #include <unordered_map>
 
 namespace {
-    class CollisionGame : public simlab::Game {
+    class BounceBalls : public simlab::Game {
       private:
 
         sf::RenderTexture renderTex;
@@ -34,7 +34,7 @@ namespace {
 
       public:
 
-        explicit CollisionGame(std::string title = "SFML Window")
+        explicit BounceBalls(std::string title = "SFML Window")
             : simlab::Game(title, sf::Style::Fullscreen,
                            createContextSettings()),
               ball(50.F),
@@ -69,7 +69,7 @@ namespace {
             // Distribution for radius
             std::uniform_real_distribution<float> distRadius(minRadius,
                                                              maxRadius);
-            std::uniform_real_distribution<float> distColor(0.F, 255.F);
+            std::uniform_int_distribution<int>    distColor(0, 255);
             for (auto& ball : balls) {
                 float radius = distRadius(gen);
                 ball.setRadius(radius);
@@ -127,7 +127,7 @@ namespace {
             std::unordered_map<sf::Vector2i, std::vector<int>, Vector2Hash<int>>
                 gridBucket;
 
-            auto ballDir = simlab::normalize(ballSpeed);
+            auto ballDir = utils::normalize(ballSpeed);
 
             ballSpeed += ballDir * acceleration / 2.F * dt;
 
@@ -141,7 +141,7 @@ namespace {
 
                 predictNextPosition(ball, speed, dt);
                 windowCollision(window, ball, speed);
-                auto cell = simlab::toVector2i(ball.getPosition() / cellSize);
+                auto cell = utils::toVector2i(ball.getPosition() / cellSize);
                 gridBucket[cell].push_back(i);
 
                 simlab::Collision::elasticCollisionAdvanced(
@@ -196,7 +196,7 @@ namespace {
             auto windowCollision =
                 simlab::Collision::windowCollision(circle, window);
             if (windowCollision.collided) {
-                velocity = simlab::reflect(velocity, windowCollision.normal);
+                velocity = utils::reflect(velocity, windowCollision.normal);
                 // Correct position to move ball out of the wall
                 auto predictedPos =
                     circle.getPosition() +
@@ -222,7 +222,7 @@ namespace {
 }  // namespace
 
 auto main() -> int {
-    CollisionGame game;
+    BounceBalls game;
     game.Run();
     return 0;
 }

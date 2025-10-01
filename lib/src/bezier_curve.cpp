@@ -20,8 +20,8 @@ namespace {
             return settings;
         }
 
-        simlab::BezierCurve curve;
-        simlab::BezierCurve curve2;
+        Drawables::BezierCurve curve;
+        Drawables::BezierCurve curve2;
 
       public:
 

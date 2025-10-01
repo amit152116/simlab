@@ -2,7 +2,7 @@
 
 #include <random>
 
-namespace simlab {
+namespace Drawables {
     using sf::Lines;
 
     BezierCurve::BezierCurve(std::vector<sf::Vector2f> controlPoints,
@@ -217,7 +217,7 @@ namespace simlab {
             auto pointA = pointArray[i];
             auto pointB = pointArray[i + 1];
 
-            auto lerp = simlab::lerp(pointA, pointB, t);
+            auto lerp = utils::lerp(pointA, pointB, t);
             if (changed) {
                 sf::Color color(distColor(generator), distColor(generator),
                                 distColor(generator));
@@ -248,7 +248,7 @@ namespace simlab {
             // Check all control points
             for (size_t i = 0; i < controlPointsShapes.size(); ++i) {
                 auto& shape = controlPointsShapes[i];
-                if (simlab::distance(shape.getPosition(), mouseWorld) <
+                if (utils::distance(shape.getPosition(), mouseWorld) <
                     hitRadius) {
                     draggingIndex = static_cast<int>(i);
                     object        = this;
@@ -285,4 +285,4 @@ namespace simlab {
             target.draw(lines, states);
         }
     }
-}  // namespace simlab
+}  // namespace Drawables

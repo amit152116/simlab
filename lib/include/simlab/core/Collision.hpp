@@ -38,7 +38,7 @@ namespace simlab {
             // Calculate distance vector from circle1 to circle2
             sf::Vector2f distanceVec =
                 circle2.getPosition() - circle1.getPosition();
-            float distance = magnitude(distanceVec);
+            float distance = utils::magnitude(distanceVec);
 
             // Sum of radii
             float radiusSum = circle1.getRadius() + circle2.getRadius();
@@ -92,7 +92,7 @@ namespace simlab {
             // Enhanced velocity resolution
             sf::Vector2f relativeVelocity = velocity2 - velocity1;
             float        velocityAlongNormal =
-                simlab::dotProduct(relativeVelocity, collision.normal);
+                utils::dotProduct(relativeVelocity, collision.normal);
 
             // Only resolve approaching velocities
             if (velocityAlongNormal > 0) {
@@ -114,13 +114,13 @@ namespace simlab {
                 // Calculate tangent vector
                 sf::Vector2f tangent =
                     relativeVelocity - velocityAlongNormal * collision.normal;
-                float tangentLength = magnitude(tangent);
+                float tangentLength = utils::magnitude(tangent);
 
                 if (tangentLength > 0.001F) {
-                    tangent = normalize(tangent);
+                    tangent = utils::normalize(tangent);
 
                     float velocityAlongTangent =
-                        dotProduct(relativeVelocity, tangent);
+                        utils::dotProduct(relativeVelocity, tangent);
 
                     float frictionImpulse = -velocityAlongTangent;
                     frictionImpulse /= ((1.0F / mass1) + (1.0F / mass2));
@@ -188,8 +188,8 @@ namespace simlab {
         // General collision check
         static auto shapeCollision(const sf::Shape& s1, const sf::Shape& s2)
             -> CollisionInfo {
-            auto poly1 = getGlobalPoints(s1);
-            auto poly2 = getGlobalPoints(s2);
+            auto poly1 = utils::getGlobalPoints(s1);
+            auto poly2 = utils::getGlobalPoints(s2);
             return polygonsIntersect(poly1, poly2);
         }
 
@@ -256,9 +256,9 @@ namespace simlab {
             sf::Vector2f mtv = smallestAxis * minOverlap;
 
             // Compute collision normal (normalize MTV)
-            auto normal = normalize(mtv);
+            auto normal = utils::normalize(mtv);
 
-            return {true, magnitude(mtv), centroid1, normal};
+            return {true, utils::magnitude(mtv), centroid1, normal};
         }
 
       private:

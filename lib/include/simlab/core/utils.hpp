@@ -39,7 +39,7 @@ struct Vector2Hash {
     }
 };
 
-namespace simlab {
+namespace utils {
 
     inline auto toVector2i(const sf::Vector2f& v) -> sf::Vector2i {
         return {static_cast<int>(std::floor(v.x)),
@@ -232,4 +232,122 @@ namespace simlab {
         return (1 - t) * a + b * t;
     }
 
-}  // namespace simlab
+    inline auto GenerateTriangle(sf::Vector2f center, float size,
+                                 sf::Color color) -> sf::VertexArray {
+        sf::VertexArray triangle(sf::PrimitiveType::Triangles);
+        sf::Vertex      v1;
+        sf::Vertex      v2;
+        sf::Vertex      v3;
+
+        v1.position = {center.x, center.y - size};
+        v2.position = {center.x - size, center.y + size};
+        v3.position = {center.x + size, center.y + size};
+
+        v1.color = v2.color = v3.color = color;
+        return triangle;
+    }
+
+    inline auto GenerateCircle(sf::Vector2f center, float radius,
+                               sf::Color color) -> sf::VertexArray {
+        const int       segments = 12;
+        sf::VertexArray circle(sf::PrimitiveType::TriangleFan);
+
+        // center of the fan
+        sf::Vertex centerVertex(center, color);
+        circle.append(centerVertex);
+
+        for (int i = 0; i <= segments; i++) {
+            float        angle = i * 2.F * M_PI / segments;
+            sf::Vector2f pos{center.x + (radius * std::cos(angle)),
+                             center.y + (radius * std::sin(angle))};
+            circle.append(sf::Vertex(pos, color));
+        }
+
+        return circle;
+    }
+
+    inline auto GenerateRectangle(sf::Vector2f center, sf::Vector2f size,
+                                  sf::Color color) -> sf::VertexArray {
+        // Half sizes
+        sf::VertexArray rectangle(sf::PrimitiveType::Triangles);
+        float           hw = size.x * 0.5F;
+        float           hh = size.y * 0.5F;
+
+        // 4 corners
+        sf::Vector2f topLeft(center.x - hw, center.y - hh);
+        sf::Vector2f topRight(center.x + hw, center.y - hh);
+        sf::Vector2f bottomLeft(center.x - hw, center.y + hh);
+        sf::Vector2f bottomRight(center.x + hw, center.y + hh);
+
+        // Two triangles → (topLeft, bottomLeft, topRight) and (topRight,
+        // bottomLeft, bottomRight)
+        rectangle.append(sf::Vertex(topLeft, color));
+        rectangle.append(sf::Vertex(bottomLeft, color));
+        rectangle.append(sf::Vertex(topRight, color));
+
+        rectangle.append(sf::Vertex(topRight, color));
+        rectangle.append(sf::Vertex(bottomLeft, color));
+        rectangle.append(sf::Vertex(bottomRight, color));
+        return rectangle;
+    }
+
+    inline auto HSLtoRGB(float h, float s, float l) -> sf::Color {
+        // h in [0, 360), s and l in [0, 1]
+        float C = (1 - std::fabs((2 * l) - 1)) * s;
+        float X = C * (1 - std::fabs(fmod(h / 60.0F, 2) - 1));
+        float m = l - (C / 2);
+
+        float r = 0;
+        float g = 0;
+        float b = 0;
+
+        if (h < 60) {
+            r = C;
+            g = X;
+        } else if (h < 120) {
+            r = X;
+            g = C;
+        } else if (h < 180) {
+            g = C;
+            b = X;
+        } else if (h < 240) {
+            g = X;
+            b = C;
+        } else if (h < 300) {
+            r = X;
+            b = C;
+        } else {
+            r = C;
+            b = X;
+        }
+
+        return {static_cast<sf::Uint8>((r + m) * 255),
+                static_cast<sf::Uint8>((g + m) * 255),
+                static_cast<sf::Uint8>((b + m) * 255)};
+    }
+
+    inline void DrawGrid(sf::RenderTarget& window, float cellSize,
+                         sf::Color color = sf::Color(150, 150, 150)) {
+        sf::Vector2u winSize = window.getSize();
+
+        // Create a vertex array for lines
+        sf::VertexArray lines(sf::Lines);
+
+        // Vertical lines
+        for (float x = 0; x <= winSize.x; x += cellSize) {
+            lines.append(sf::Vertex(sf::Vector2f(x, 0), color));
+            lines.append(sf::Vertex(
+                sf::Vector2f(x, static_cast<float>(winSize.y)), color));
+        }
+
+        // Horizontal lines
+        for (float y = 0; y <= winSize.y; y += cellSize) {
+            lines.append(sf::Vertex(sf::Vector2f(0, y), color));
+            lines.append(sf::Vertex(
+                sf::Vector2f(static_cast<float>(winSize.x), y), color));
+        }
+
+        // Draw all lines in one call
+        window.draw(lines);
+    }
+}  // namespace utils

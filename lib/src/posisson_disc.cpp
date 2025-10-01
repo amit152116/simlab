@@ -1,7 +1,6 @@
 
 #include "simlab/simlab.hpp"
 
-#include <cstddef>
 #include <optional>
 #include <random>
 #include <unordered_map>
@@ -38,7 +37,8 @@ namespace {
 
         static auto createContextSettings() -> sf::ContextSettings {
             sf::ContextSettings settings;
-            settings.sRgbCapable = true;
+            settings.sRgbCapable       = true;
+            settings.antialiasingLevel = 8;
             return settings;
         }
 
@@ -61,6 +61,8 @@ namespace {
             pointSprite.setTexture(renderTex.getTexture());
             initalize();
         }
+
+      private:
 
         void initalize() {
             counter = 0;
@@ -176,7 +178,7 @@ namespace {
                                 continue;
                             }
 
-                            if (simlab::distance(sample, neighbor.value()) <=
+                            if (utils::distance(sample, neighbor.value()) <=
                                 R) {
                                 ok = false;
                                 break;

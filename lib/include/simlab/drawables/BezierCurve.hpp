@@ -3,7 +3,7 @@
 
 #include "simlab/core/utils.hpp"
 
-namespace simlab {
+namespace Drawables {
 
     class BezierCurve : public sf::Drawable {
       public:
@@ -89,4 +89,4 @@ namespace simlab {
         bool showLines_         = false;
     };
 
-}  // namespace simlab
+}  // namespace Drawables
