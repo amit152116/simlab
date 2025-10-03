@@ -47,12 +47,12 @@ namespace {
             squares.resize(gridWidth);
 
             states.resize(gridWidth);
-            initalize();
+            init();
         }
 
       private:
 
-        void initalize() {
+        void init() {
             renderTex.clear(sf::Color::Black);
             currRow = 1;
             std::bernoulli_distribution dist(probabilityOfOne);
@@ -113,7 +113,7 @@ namespace {
                 event.mouseButton.button == sf::Mouse::Right) {
                 RULE = distRule(generator);
                 log.info("RULE: {}", RULE);
-                initalize();
+                init();
             }
         }
     };

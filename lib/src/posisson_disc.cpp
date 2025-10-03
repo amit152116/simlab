@@ -59,12 +59,12 @@ namespace {
             log.info("cellSize: {}\n", cellSize);
             renderTex.create(width, height);
             pointSprite.setTexture(renderTex.getTexture());
-            initalize();
+            init();
         }
 
       private:
 
-        void initalize() {
+        void init() {
             counter = 0;
             renderTex.clear(sf::Color::Black);
             renderTex.display();  // IMPORTANT: Display after clear
@@ -204,7 +204,7 @@ namespace {
 
         void handleEvents(sf::Event& event) override {
             if (event.type == sf::Event::MouseButtonPressed) {
-                initalize();
+                init();
             }
         }
     };

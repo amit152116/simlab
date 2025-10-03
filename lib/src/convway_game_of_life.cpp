@@ -8,7 +8,7 @@ namespace {
       private:
 
         float probabilityOfOne = 0.25F;  // 20% chance of 1, 70% chance of 0
-        float cellSize         = 5.F;
+        float cellSize         = 25.F;
 
         sf::RenderTexture renderGrid;
         sf::RenderTexture renderTex;
@@ -45,15 +45,15 @@ namespace {
             gridHeight = window.getSize().y / static_cast<int>(cellSize);
 
             auto color = this->color;
-            color.a    = 0;
+            color.a    = 100;
             utils::DrawGrid(renderGrid, cellSize, color);
             renderGrid.display();
-            initalize();
+            init();
         }
 
       private:
 
-        void initalize() {
+        void init() {
             renderTex.clear(sf::Color::Transparent);
             grid.clear();
 
@@ -64,7 +64,7 @@ namespace {
             for (int i = 0; i < gridHeight; i++) {
                 grid[i].resize(gridWidth);
                 for (int j = 0; j < gridWidth; j++) {
-                    grid[i][j] = dist(generator);
+                    // grid[i][j] = dist(generator);
                     if (grid[i][j]) {
                         drawRectangle(i, j);
                     }
@@ -112,49 +112,6 @@ namespace {
             grid = std::move(nextGrid);
         }
 
-        static auto HSVtoRGB(float h, float s, float v) -> sf::Color {
-            int   i = static_cast<int>(h * 6);
-            float f = (h * 6) - i;
-            float p = v * (1 - s);
-            float q = v * (1 - f * s);
-            float t = v * (1 - (1 - f) * s);
-
-            float r, g, b;
-            switch (i % 6) {
-                case 0:
-                    r = v;
-                    g = t;
-                    b = p;
-                    break;
-                case 1:
-                    r = q;
-                    g = v;
-                    b = p;
-                    break;
-                case 2:
-                    r = p;
-                    g = v;
-                    b = t;
-                    break;
-                case 3:
-                    r = p;
-                    g = q;
-                    b = v;
-                    break;
-                case 4:
-                    r = t;
-                    g = p;
-                    b = v;
-                    break;
-                case 5:
-                    r = v;
-                    g = p;
-                    b = q;
-                    break;
-            }
-            return sf::Color(r * 255, g * 255, b * 255);
-        }
-
         void drawRectangle(int i, int j) {
             sf::Vector2f center((j * cellSize) + (cellSize / 2.F),
                                 (i * cellSize) + (cellSize / 2.F));
@@ -166,7 +123,7 @@ namespace {
             float dy   = (i - cy) / cy;
             float dist = std::sqrt((dx * dx) + (dy * dy));
 
-            sf::Color color = HSVtoRGB(dist, 1.0F, 1.0F);
+            sf::Color color = utils::HSVtoRGB(dist, 1.0F, 1.0F);
             auto      rect =
                 utils::GenerateRectangle(center, {cellSize, cellSize}, color);
             renderTex.draw(rect);
@@ -197,7 +154,7 @@ namespace {
                 button == sf::Mouse::Right) {
                 dragging = false;
                 dragPos.clear();
-                initalize();
+                init();
             }
 
             if (type == sf::Event::MouseButtonPressed &&

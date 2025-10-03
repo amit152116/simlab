@@ -226,7 +226,7 @@ namespace utils {
     inline auto lerp(const sf::Vector2<T>& a, const sf::Vector2<T>& b, float t)
         -> sf::Vector2<T> {
         if (t < 0.F || t > 1.F) {
-            throw std::runtime_error(fmt::format(
+            throw std::logic_error(fmt::format(
                 "wrong value: {}\nlerp: t must be between 0 and 1", t));
         }
         return (1 - t) * a + b * t;
@@ -289,6 +289,49 @@ namespace utils {
         rectangle.append(sf::Vertex(bottomLeft, color));
         rectangle.append(sf::Vertex(bottomRight, color));
         return rectangle;
+    }
+
+    inline auto HSVtoRGB(float h, float s, float v) -> sf::Color {
+        int   i = static_cast<int>(h * 6);
+        float f = (h * 6) - i;
+        float p = v * (1 - s);
+        float q = v * (1 - f * s);
+        float t = v * (1 - (1 - f) * s);
+
+        float r, g, b;
+        switch (i % 6) {
+            case 0:
+                r = v;
+                g = t;
+                b = p;
+                break;
+            case 1:
+                r = q;
+                g = v;
+                b = p;
+                break;
+            case 2:
+                r = p;
+                g = v;
+                b = t;
+                break;
+            case 3:
+                r = p;
+                g = q;
+                b = v;
+                break;
+            case 4:
+                r = t;
+                g = p;
+                b = v;
+                break;
+            case 5:
+                r = v;
+                g = p;
+                b = q;
+                break;
+        }
+        return sf::Color(r * 255, g * 255, b * 255);
     }
 
     inline auto HSLtoRGB(float h, float s, float l) -> sf::Color {

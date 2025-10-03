@@ -89,7 +89,7 @@ namespace {
 
 }  // namespace
 
-int main(int argc, char* argv[]) {
+auto main(int /*argc*/, char* /*argv*/[]) -> int {
     DrawBezierCurve game;
     game.Run();
     return 0;

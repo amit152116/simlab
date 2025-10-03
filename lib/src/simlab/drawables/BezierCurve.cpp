@@ -37,8 +37,7 @@ namespace Drawables {
     auto BezierCurve::setControlPoint(size_t index, sf::Vector2f point)
         -> void {
         if (index < 0 || index >= controlPoints.size()) {
-            throw std::runtime_error(
-                "index out of range for the Control Point");
+            throw std::logic_error("index out of range for the Control Point");
         }
         controlPoints[index] = point;
         controlPointsShapes[index].setPosition(point);
