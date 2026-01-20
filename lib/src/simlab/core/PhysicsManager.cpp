@@ -123,8 +123,8 @@ namespace simlab {
         auto promise  = std::make_shared<std::promise<ReturnT>>();
         auto future   = promise->get_future();
 
-        auto task = [func = std::forward<Func>(func),
-                     promise]() mutable -> auto {
+        auto task =
+            [ func = std::forward<Func>(func), promise ]() mutable -> auto{
             if constexpr (std::is_void_v<ReturnT>) {
                 func();
                 promise->set_value();

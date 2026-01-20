@@ -1,6 +1,7 @@
 #include "simlab/simlab.hpp"
 
 #include <random>
+#include <unordered_set>
 
 namespace {
 
@@ -8,7 +9,7 @@ namespace {
       private:
 
         float probabilityOfOne = 0.25F;  // 20% chance of 1, 70% chance of 0
-        float cellSize         = 25.F;
+        float cellSize         = 10.F;
 
         sf::RenderTexture renderGrid;
         sf::RenderTexture renderTex;
@@ -130,7 +131,7 @@ namespace {
         }
 
         void Draw(sf::RenderWindow& win) override {
-            for (auto& drag : dragPos) {
+            for (const auto& drag : dragPos) {
                 drawRectangle(drag.y, drag.x);
             }
             renderTex.display();
@@ -160,7 +161,12 @@ namespace {
             if (type == sf::Event::MouseButtonPressed &&
                 button == sf::Mouse::Left) {
                 dragging = true;
-                dragPos.emplace_back(mousePos);
+                auto it  = std::find(dragPos.begin(), dragPos.end(), mousePos);
+                if (it != dragPos.end()) {
+                    dragPos.erase(it);
+                } else {
+                    dragPos.emplace_back(mousePos);
+                }
             }
 
             if (type == sf::Event::MouseButtonReleased &&

@@ -98,7 +98,7 @@ class Benchmark {
             }
             double avg = sum / times.size();
 
-            auto color = fmt::color::light_green;
+            auto color = fmt::color::light_sea_green;
             fmt::print(fg(color), "  Runs       : {}\n", times.size());
             fmt::print(fg(color), "  Avg Time   : {:.3f} ms\n", avg);
             fmt::print(fg(color), "  Min Time   : {:.3f} ms\n", min);
